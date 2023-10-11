@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button } from 'react-native';
-import { ProgressCircle } from 'react-native-svg-charts';
+
+import { View, Text, Platform } from 'react-native';
 import styles from './styles';
 import { useTheme } from '@/hooks';
+import { Button, Appbar } from 'react-native-paper';
 
-type ChartData = {
-  progress: number;
-  progressColor: string;
-  startAngle: number;
-};
-
+import FastingProgressGauge from '@/components/HomePage/FastingProgressGauge';
+import HeaderBar from '@/components/Main/Header/HeaderBar';
 
 const HomePage: React.FC = () => {
   const [isFasting, setIsFasting] = useState<boolean>(false);
@@ -27,15 +24,6 @@ const HomePage: React.FC = () => {
     { name: "Long-term Fasting State", duration: 48 * 60 } // Same as the previous stage, since it's the last one
   ];
 
-
-  const dataJSON = `[
-    {
-      "progress": 0,
-      "progressColor": "${Colors.progressCircleColor}",
-      "startAngle": -2.5
-    }
-  ]`;
-
   const calculateProgress = () => {
     if (!isFasting) return 0;
 
@@ -45,8 +33,6 @@ const HomePage: React.FC = () => {
     return timeProgress / totalTargetMinutes;
   };
 
-
-
   const getCurrentStage = (minutesElapsed: number) => {
     if (!isFasting) return "Eating Period";
 
@@ -55,15 +41,6 @@ const HomePage: React.FC = () => {
       minutesElapsed -= stage.duration;
     }
     return "Long-term Fasting State";
-  };
-
-  // time formatting function
-  const formatTime = (seconds: number) => {
-    seconds = Math.floor(seconds); // Ensure seconds are always rounded down to the nearest integer
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
   };
 
   useEffect(() => {
@@ -80,49 +57,32 @@ const HomePage: React.FC = () => {
     }
   }, [isFasting, startTime]);
 
-
-
-
-
-  const data: ChartData[] = JSON.parse(dataJSON);
-
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={Fonts.titleLarge}>Fasttt</Text>
-      </View>
-      <View style={styles.chartContainer}>
-        <ProgressCircle
-          style={styles.chart}
-          progress={calculateProgress()}
-          progressColor={Colors.progressCircleColor}
-          backgroundColor={isFasting ? Colors.progressCircleBackgroundColorActive : Colors.progressCircleBackgroundColorInactive}
-          strokeWidth={10}
-        />
-        <Text style={styles.timeText}>
-          {formatTime(elapsedSeconds)}
-        </Text>
-        <Text style={styles.stageText}>
-          {getCurrentStage(calculateProgress() * STAGES[STAGES.length - 1].duration / 60)}
-        </Text>
-      </View>
+    <View style={{ flex: 1 }}>
+      <HeaderBar />
+      <View style={styles.container}>
+        <View style={styles.chartContainer}>
+          <FastingProgressGauge
+            progress={calculateProgress()}
+            isFasting={isFasting}
+            elapsedSeconds={elapsedSeconds}
+            getCurrentStage={getCurrentStage}
+          />
+        </View>
 
-
-      <Button
-        title={isFasting ? 'Stop Fasting' : 'Start Fasting'}
-        onPress={() => {
+        <Button mode="contained" onPress={() => {
+          // Your button logic here
           setIsFasting(!isFasting);
           if (!isFasting) {
             setStartTime(new Date()); // Reset the start time when starting fasting
           } else {
             setProgress(0); // Reset progress when stopping fasting
           }
-        }}
-        color={Colors.primary}
-      />
+        }}>
+          {isFasting ? 'Stop Fasting' : 'Start Fasting'}
+        </Button>
 
-
+      </View>
     </View>
   );
 };

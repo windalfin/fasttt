@@ -5,9 +5,12 @@ import { PersistGate } from 'redux-persist/lib/integration/react';
 import { store, persistor } from './store';
 import ApplicationNavigator from './navigators/Application';
 import './translations';
+import { PaperProvider } from 'react-native-paper';
+
 
 const App = () => (
   <Provider store={store}>
+    <PaperProvider>
     {/**
      * PersistGate delays the rendering of the app's UI until the persisted state has been retrieved
      * and saved to redux.
@@ -18,6 +21,7 @@ const App = () => (
     <PersistGate loading={null} persistor={persistor}>
       <ApplicationNavigator />
     </PersistGate>
+    </PaperProvider>
   </Provider>
 );
 

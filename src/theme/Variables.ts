@@ -18,12 +18,16 @@ export const Colors = {
   textGray800: '#000000',
   textGray400: '#4D4D4D',
   textGray200: '#A1A1A1',
-  primary: '#E14032',
+  primary: '#4C076AB5',
   success: '#28a745',
   error: '#dc3545',
+  fontHeader: '#ffffff',
   //ComponentColors
   circleButtonBackground: '#E1E1EF',
   circleButtonColor: '#44427D',
+
+  //HeaderBar
+  headerIconColor: '#ffffff',
   //ProgressCircleColors
   progressCircleColor: '#D000FF',
   progressCircleBackgroundColorActive: '#D8A5F7',
