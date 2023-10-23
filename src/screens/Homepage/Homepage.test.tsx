@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
-import store from '../store';
-import HomePage from '../HomePage';
+import store from './store';
+import HomePage from './HomePage';
 
 describe('HomePage', () => {
   it('renders the header correctly', () => {
@@ -24,29 +24,38 @@ describe('HomePage', () => {
   });
 
   it('starts and stops fasting correctly', () => {
-    const { getByText } = render(
-        <Provider store={store}>
-            <HomePage />
-        </Provider>,
+    const { getByText, rerender } = render(
+      <Provider store={store}>
+        <HomePage />
+      </Provider>,
     );
     const button = getByText('Start Fasting');
     fireEvent.press(button);
-    expect(button.props.title).toBe('Stop Fasting');
+    rerender(
+      <Provider store={store}>
+        <HomePage />
+      </Provider>,
+    );
+    expect(getByText('Stop Fasting')).toBeDefined();
     fireEvent.press(button);
-    expect(button.props.title).toBe('Start Fasting');
+    rerender(
+      <Provider store={store}>
+        <HomePage />
+      </Provider>,
+    );
+    expect(getByText('Start Fasting')).toBeDefined();
   });
 
   it('calculates progress correctly', () => {
     const { getByText } = render(
-        <Provider store={store}>
-            <HomePage />
-        </Provider>,
+      <Provider store={store}>
+        <HomePage />
+      </Provider>,
     );
     const button = getByText('Start Fasting');
     fireEvent.press(button);
-    setTimeout(() => {
-      expect(getByText('0:01:00')).toBeDefined();
-    }, 60000);
+    act(() => jest.advanceTimersByTime(60000));
+    expect(getByText('0:01:00')).toBeDefined();
   });
 
   it('formats time correctly', () => {

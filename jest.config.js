@@ -6,7 +6,7 @@ module.exports = {
     '<rootDir>/jest.setup.js',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(jest-)?react-native|@react-native|@react-native-community|@react-navigation)',
+    'node_modules/(?!(jest-)?react-native|@react-native|@react-native-community|@react-navigation|@shopify/react-native-skia|zrender)',
   ],
   collectCoverageFrom: [
     '<rootDir>/src/Components/**/*.jsx',
@@ -16,4 +16,7 @@ module.exports = {
   ],
   coverageReporters: ['html', 'text', 'text-summary', 'cobertura'],
   testMatch: ['**/*.test.ts?(x)', '**/*.test.js?(x)'],
+  // testEnvironment: 'jsdom',
+  setupFiles: ['./jest.setup.js'],
+  setupFilesAfterEnv: ['./jest.setup.js'],
 };

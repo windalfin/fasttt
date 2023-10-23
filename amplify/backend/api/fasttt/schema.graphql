@@ -1,0 +1,24 @@
+type User @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  profile: Profile @hasOne(fields: ["id"])
+  fastingHistory: [FastingEvent] @hasMany(indexName: "byUser", fields: ["id"])
+}
+
+type Profile @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  name: String!
+  age: Int!
+  gender: String
+  weight: Float
+  height: Float
+  user: User @belongsTo(fields: ["id"])
+}
+
+type FastingEvent @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  userId: ID! @index(name: "byUser")
+  startTime: AWSDateTime!
+  endTime: AWSDateTime!
+  duration: Float!
+  user: User @belongsTo(fields: ["userId"])
+}

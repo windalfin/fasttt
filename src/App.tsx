@@ -7,6 +7,11 @@ import ApplicationNavigator from './navigators/Application';
 import './translations';
 import { PaperProvider } from 'react-native-paper';
 
+import Amplify from 'aws-amplify';
+import config from './aws-exports';
+
+
+Amplify.configure(config);
 
 const App = () => (
   <Provider store={store}>

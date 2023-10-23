@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "fasttt",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authfastttea49dc77",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

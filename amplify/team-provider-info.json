@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fasttt-dev-123317-authRole",
+      "UnauthRoleArn": "arn:aws:iam::446877474142:role/amplify-fasttt-dev-123317-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::446877474142:role/amplify-fasttt-dev-123317-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-fasttt-dev-123317-deployment",
+      "UnauthRoleName": "amplify-fasttt-dev-123317-unauthRole",
+      "StackName": "amplify-fasttt-dev-123317",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:446877474142:stack/amplify-fasttt-dev-123317/ac278210-7165-11ee-93b4-0adbc72823b0",
+      "AmplifyAppId": "d3v9tlsjaeehw5"
+    },
+    "categories": {
+      "auth": {
+        "fastttea49dc77": {}
+      },
+      "api": {
+        "fasttt": {}
+      }
+    }
+  }
+}

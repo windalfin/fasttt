@@ -1,6 +1,15 @@
+import 'jest';
 import 'whatwg-fetch';
 import 'react-native-gesture-handler/jestSetup';
-import '@testing-library/jest-native/extend-expect';
+
+// jest.setup.js
+require('react-native');
+if (global.performance) {
+  delete global.performance;
+}
+global.performance = {
+  now: Date.now,
+};
 
 jest.mock('react-native-reanimated', () =>
   require('react-native-reanimated/mock'),
@@ -14,6 +23,11 @@ jest.mock('redux-persist', () => {
       .fn()
       .mockImplementation((config, reducers) => reducers),
   };
+});
+
+jest.mock('@shopify/react-native-skia', () => {
+  // return the mock implementation
+  return {};
 });
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
@@ -34,3 +48,5 @@ jest.mock('react-i18next', () => ({
     init: jest.fn(),
   },
 }));
+
+import '@testing-library/jest-native/extend-expect';
