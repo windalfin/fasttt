@@ -1,22 +1,20 @@
 import { StyleSheet } from 'react-native';
-import { useTheme } from '@/hooks';
-const { Colors, Fonts } = useTheme();
 
 
 const headerBarStyles = StyleSheet.create({
     header: {
         height: 44,
-        backgroundColor: Colors.primary,
+        backgroundColor: '#4C076AB5',
     },
     backButton: {
-        color: Colors.headerIconColor,
+        color: '#ffffff',
     },
     title: {
-        color: Colors.headerIconColor,
+        color: '#ffffff',
 	fontWeight: 'bold',
     },
     moreIcon: {
-        color: Colors.headerIconColor,
+        color: '#ffffff',
     },
 });
 
