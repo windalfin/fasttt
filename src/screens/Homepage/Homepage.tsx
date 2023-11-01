@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-
-import { API, graphqlOperation } from 'aws-amplify';
-import { createFastingEvent } from '@/api/graphql/mutations';
-import { listFastingEvents } from '@/api/graphql/queries';
+import { API, GraphQLQuery, GRAPHQL_AUTH_MODE } from '@aws-amplify/api';
+import * as mutations from '@/api/graphql/mutations';
+import * as queries from '@/api/graphql/queries';
+import { CreateFastingEventMutation } from '@/api/API'; // Assuming this type is defined in your API.ts file
 
 import { Auth } from 'aws-amplify';
-import { useAuth } from '@/contexts/Auth/AuthContexts';
-
 import { View, Text, Platform } from 'react-native';
 import styles from './styles';
 import { useTheme } from '@/hooks';
@@ -16,7 +14,8 @@ import FastingProgressGauge from '@/components/HomePage/FastingProgressGauge';
 import HeaderBar from '@/components/Main/Header/HeaderBar';
 
 const HomePage: React.FC = () => {
-  const { setUserId } = useAuth();
+  const [userId, setUserId] = useState(null);
+  const [cognitoUser, setCognitoUser] = useState(null);
   const [isFasting, setIsFasting] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [startTime, setStartTime] = useState<Date>(new Date()); // Set to the current time initially
@@ -53,28 +52,48 @@ const HomePage: React.FC = () => {
     return 'Long-term Fasting State';
   };
 
-  const logout = () => {
-    setUserId(null);
+  const logout = async () => {
+    try {
+      await Auth.signOut();
+      setCognitoUser(null);
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
   };
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const user = await Auth.currentAuthenticatedUser();
+        setCognitoUser(user);
+      } catch (error) {
+        console.log('Error fetching Cognito user:', error);
+        setCognitoUser(null);
+      }
+    };
+
+    checkUser();
+  }, []);
 
   const handleFastingToggle = async () => {
     setIsFasting(!isFasting);
     if (!isFasting) {
       setStartTime(new Date()); // Reset the start time when starting fasting
     } else {
-      // Record fasting event when stopping fasting
       const endTime = new Date();
       const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60); // in minutes
       const fastingEventData = {
-        userId: 'Win',
+        userId: cognitoUser.attributes.sub,
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
         duration: duration,
       };
       try {
-        await API.graphql(
-          graphqlOperation(createFastingEvent, { input: fastingEventData }),
-        );
+        await API.graphql<GraphQLQuery<CreateFastingEventMutation>>({
+          query: mutations.createFastingEvent,
+          variables: { input: fastingEventData },
+          authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS
+        });
       } catch (error) {
         console.error('Error recording fasting event:', error);
       }
@@ -83,38 +102,27 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const user = await Auth.currentAuthenticatedUser();
-        const userId = user.attributes.sub; // Unique user ID
-        setUserId(userId);
-      } catch (error) {
-        console.log('Error fetching user:', error);
-        // If error, user is not authenticated, ensure userId is null
-        setUserId(null);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
     const fetchFastingEvents = async () => {
       try {
-        const response = await API.graphql(
-          graphqlOperation(listFastingEvents, {
-            filter: { userId: { eq: 'YOUR_USER_ID' } },
-          }),
-        );
-        if ('data' in response) {
-          setFastingEvents(response.data.listFastingEvents.items);
+        if (cognitoUser) {
+          const response = await API.graphql<GraphQLQuery<any>>({  // Adjust the generic type based on the expected response type
+            query: queries.listFastingEvents,
+            variables: {
+              filter: { userId: { eq: cognitoUser.attributes.sub } },
+            },
+            authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+          });
+          if ('data' in response) {
+            setFastingEvents(response.data.listFastingEvents.items);
+          }
         }
       } catch (error) {
         console.error('Error fetching fasting events:', error);
       }
     };
     fetchFastingEvents();
-  }, []);
+  }, [cognitoUser]);
+
 
   useEffect(() => {
     if (isFasting) {
